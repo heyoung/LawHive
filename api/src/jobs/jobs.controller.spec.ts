@@ -8,6 +8,7 @@ const TestJobs: Job[] = [
     title: 'test - title',
     description: 'test description',
     state: 'started',
+    fee: { type: 'fixed-fee', fee: 10 },
   },
 ]
 
@@ -47,7 +48,11 @@ describe('Jobs controller', () => {
 
   describe('add', () => {
     it('should return added job', async () => {
-      const result = await controller.add({ title: '', description: '' })
+      const result = await controller.add({
+        title: '',
+        description: '',
+        fee: { type: 'fixed-fee', fee: 10 },
+      })
       expect(result).toEqual(TestCreatedJob)
     })
   })
