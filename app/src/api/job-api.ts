@@ -9,7 +9,7 @@ export function getAllJobs(): Promise<E.Either<Job[], ErrorResponse>> {
 }
 
 export function createJob(
-  dto: Pick<Job, 'title' | 'description'>,
+  dto: Pick<Job, 'title' | 'description' | 'fee'>,
 ): Promise<E.Either<Job, ErrorResponse>> {
   return sendRequest<Job>(() => axios.post('/v1/jobs', dto))
 }
