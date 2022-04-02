@@ -8,7 +8,10 @@ import './App.css'
 const theme = createTheme()
 
 function App() {
-  const onSubmit = () => {}
+  const onSubmit = () => {
+    console.log('no op')
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
