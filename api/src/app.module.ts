@@ -5,7 +5,9 @@ import { JobsModule } from './jobs/jobs.module'
 @Module({
   imports: [
     // TODO: push the connection user + pwd to be in config. Do we need to set the user up in docker compose too?
-    MongooseModule.forRoot('mongodb://root:root@localhost:27017/'),
+    MongooseModule.forRoot(
+      (global as any).__MONGO_URI__ ?? 'mongodb://root:root@localhost:27017/',
+    ),
     JobsModule,
   ],
   controllers: [],
