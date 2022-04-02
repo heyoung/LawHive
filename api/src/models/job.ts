@@ -5,6 +5,8 @@ import { Document } from 'mongoose'
 // TODO: split this file out?
 export type JobDocument = Job & Document
 
+type JobState = 'started'
+
 @Schema()
 export class Job {
   @Prop()
@@ -12,6 +14,9 @@ export class Job {
 
   @Prop()
   description: string
+
+  @Prop()
+  state: JobState
 }
 
 export class CreateJobDto {

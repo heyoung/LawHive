@@ -49,6 +49,7 @@ describe('JobsController (e2e)', () => {
 
     // Assert
     expect(resp.body).toMatchObject(body)
+    expect(resp.body).toHaveProperty('state', 'started')
     expect(mongoose.isValidObjectId(resp.body._id)).toBe(true)
   })
 

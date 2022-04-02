@@ -7,13 +7,15 @@ const TestJobs: Job[] = [
   {
     title: 'test - title',
     description: 'test description',
+    state: 'started',
   },
 ]
 
 const TestCreatedJob = {
   title: 'created job',
   description: 'created job description',
-  __id: 'test id',
+  state: 'started',
+  _id: 'test id',
 }
 
 describe('Jobs controller', () => {

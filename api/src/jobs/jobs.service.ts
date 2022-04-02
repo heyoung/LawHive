@@ -10,7 +10,7 @@ export class JobsService {
   ) {}
 
   create(dto: CreateJobDto): Promise<Job> {
-    return new this.jobModel(dto).save()
+    return new this.jobModel({ ...dto, state: 'started' }).save()
   }
 
   getAll(): Promise<Job[]> {
