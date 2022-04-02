@@ -3,13 +3,15 @@ import { Box, CircularProgress, Paper, Stack, TextField } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
 import Grid from '@mui/material/Grid'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
-import React from 'react'
 import './App.css'
 
 const theme = createTheme()
 
 function App() {
-  const onSubmit = () => {}
+  const onSubmit = () => {
+    console.log('no op')
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
@@ -37,11 +39,7 @@ function App() {
                   name="title"
                   autoFocus
                 />
-                <LoadingButton 
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                >
+                <LoadingButton type="submit" fullWidth variant="contained">
                   Build
                 </LoadingButton>
               </Stack>
@@ -49,12 +47,7 @@ function App() {
           </Box>
         </Grid>
 
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-        >
+        <Grid item xs={false} sm={4} md={7}>
           <Box
             sx={{
               my: 8,
