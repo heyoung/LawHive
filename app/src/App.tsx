@@ -1,66 +1,30 @@
-import { LoadingButton } from '@mui/lab'
-import { Box, CircularProgress, Paper, Stack, TextField } from '@mui/material'
-import CssBaseline from '@mui/material/CssBaseline'
-import Grid from '@mui/material/Grid'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { AppBar, Button, Container, Toolbar } from '@mui/material'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import './App.css'
+import Jobs from './views/Jobs'
+import AddJob from './views/AddJob'
 
 const theme = createTheme()
 
 function App() {
-  const onSubmit = () => {
-    console.log('no op')
-  }
-
+  const navigate = useNavigate()
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: '100vh' }}>
-        <CssBaseline />
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-          <Box
-            sx={{
-              my: 8,
-              mx: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <span>Hello world</span>
-
-            <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 1 }}>
-              <Stack gap={2} width={'100%'}>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="title"
-                  label="Title"
-                  name="title"
-                  autoFocus
-                />
-                <LoadingButton type="submit" fullWidth variant="contained">
-                  Build
-                </LoadingButton>
-              </Stack>
-            </Box>
-          </Box>
-        </Grid>
-
-        <Grid item xs={false} sm={4} md={7}>
-          <Box
-            sx={{
-              my: 8,
-              mx: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        </Grid>
-      </Grid>
+      <AppBar position="static" color="transparent">
+        <Toolbar>
+          <Button color="secondary" onClick={() => navigate('/jobs')}>
+            View Jobs
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Container>
+        <Routes>
+          <Route path="/" element={<Navigate to="/jobs" />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/add-job" element={<AddJob />} />
+        </Routes>
+      </Container>
     </ThemeProvider>
   )
 }
