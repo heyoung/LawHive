@@ -1,12 +1,15 @@
 import ErrorResponse from '../../models/error-response'
 import * as E from 'fp-ts/lib/Either'
 import axios from 'axios'
+import OkResponse from '../../models/ok-response'
 
 export async function sendRequest<T>(
-  fn: () => Promise<T>,
+  fn: () => Promise<OkResponse<T>>,
 ): Promise<E.Either<T, ErrorResponse>> {
   try {
-    return E.left(await fn())
+    const response = await fn()
+
+    return E.left(response.data)
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return E.right({
