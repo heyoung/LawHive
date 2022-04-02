@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
 import { JobsModule } from './jobs/jobs.module'
 
 @Module({
@@ -10,7 +8,7 @@ import { JobsModule } from './jobs/jobs.module'
     MongooseModule.forRoot('mongodb://root:root@localhost:27017/'),
     JobsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
