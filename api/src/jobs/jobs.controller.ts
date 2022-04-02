@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
-import { CreateJobDto, Job } from 'src/models/job'
+import { CreateJobDto, Job } from '../models/job'
 import { JobsService } from './jobs.service'
 
 @Controller({ path: 'jobs', version: '1' })
