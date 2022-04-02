@@ -3,6 +3,10 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import { useFormik } from 'formik'
 import { useState } from 'react'
 import * as yup from 'yup'
+import { createJob } from '../api/job-api'
+import { pipe } from 'fp-ts/lib/function'
+import { match } from 'fp-ts/lib/Either'
+import { useNavigate } from 'react-router-dom'
 
 const validationSchema = yup.object({
   title: yup.string().required('title is required'),
@@ -11,12 +15,25 @@ const validationSchema = yup.object({
 
 const JobForm: React.FC = () => {
   const [error, setError] = useState<string | undefined>()
+  const navigate = useNavigate()
 
   const formik = useFormik({
     initialValues: { title: '', description: '' },
     validationSchema,
-    onSubmit: (values) => {
-      console.log(values)
+    onSubmit: async (values) => {
+      const response = await createJob(values)
+
+      pipe(
+        response,
+        match(
+          () => {
+            navigate('/jobs')
+          },
+          (err) => {
+            setError(err.error)
+          },
+        ),
+      )
     },
   })
 
@@ -46,9 +63,9 @@ const JobForm: React.FC = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                id="name"
-                name="name"
-                label="Name"
+                id="title"
+                name="title"
+                label="Title"
                 fullWidth
                 value={formik.values.title}
                 onChange={formik.handleChange}
