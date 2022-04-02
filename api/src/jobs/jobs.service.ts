@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Job, JobDocument } from 'src/models/job'
+import { CreateJobDto, Job, JobDocument } from 'src/models/job'
 import { Model } from 'mongoose'
 
 @Injectable()
@@ -9,8 +9,8 @@ export class JobsService {
     @InjectModel(Job.name) private readonly jobModel: Model<JobDocument>,
   ) {}
 
-  create(job: Job): Promise<Job> {
-    return new this.jobModel(job).save()
+  create(dto: CreateJobDto): Promise<Job> {
+    return new this.jobModel(dto).save()
   }
 
   getAll(): Promise<Job[]> {

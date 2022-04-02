@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
-import { Job } from 'src/models/job'
+import { CreateJobDto, Job } from 'src/models/job'
 import { JobsService } from './jobs.service'
 
 @Controller({ path: 'jobs', version: '1' })
@@ -12,7 +12,7 @@ export class JobsController {
   }
 
   @Post()
-  add(@Body() parameters: Job): Promise<Job> {
+  add(@Body() parameters: CreateJobDto): Promise<Job> {
     return this.jobsService.create(parameters)
   }
 }
