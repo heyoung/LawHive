@@ -12,6 +12,7 @@ import { pipe } from 'fp-ts/lib/function'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getAllJobs } from '../api/job-api'
+import JobPayment from '../components/JobPayment'
 import Job from '../models/job'
 
 const Jobs: React.FC = () => {
@@ -61,10 +62,12 @@ const Jobs: React.FC = () => {
 }
 
 const JobDetail: React.FC<{ job: Job }> = ({ job }) => {
+  // TODO: make this look nice...
   return (
     <Card sx={{ display: 'flex', mt: 2 }}>
       <div>
         <CardContent>
+          {/* TODO: these two chips duplicate eachother when job has been paid */}
           <Chip label={job.state} color="primary" />
           <Chip label={job.payment.status} color="primary" />
           <Typography gutterBottom variant="h5" component="div">
@@ -79,6 +82,16 @@ const JobDetail: React.FC<{ job: Job }> = ({ job }) => {
               ? `£${job.fee.fee}`
               : `${job.fee.feePct}%`}
           </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Amount paid:
+            {job.payment.status === 'paid'
+              ? `£${job.payment.amount}`
+              : 'Nothing!'}
+          </Typography>
+          <JobPayment
+            job={job}
+            onPaymentSubmitted={() => window.location.reload()}
+          />
         </CardContent>
       </div>
     </Card>
