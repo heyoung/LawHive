@@ -60,14 +60,14 @@ const JobForm: React.FC = () => {
 
         fee = {
           type: 'no-win-no-fee',
-          feePct: values.feePct,
+          feePct: Number(values.feePct),
         }
       } else {
         if (values.fee === undefined) {
           throw new Error('fee is undefined')
         }
 
-        fee = { type: 'fixed-fee', fee: values.fee }
+        fee = { type: 'fixed-fee', fee: Number(values.fee) }
       }
 
       const response = await createJob({
@@ -83,7 +83,7 @@ const JobForm: React.FC = () => {
             navigate('/jobs')
           },
           (err) => {
-            setError(err.error)
+            setError(`${err.error}. ${err.message}`)
           },
         ),
       )

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { CreateJobDto, Job, JobDocument } from '../models/job'
+import { CreateJobDto, Job, JobDocument, UpdateJobDto } from '../models/job'
 import { Model } from 'mongoose'
 
+// TODO: handle mongo failures; return result type
 @Injectable()
 export class JobsService {
   constructor(
@@ -10,7 +11,23 @@ export class JobsService {
   ) {}
 
   create(dto: CreateJobDto): Promise<Job> {
-    return new this.jobModel({ ...dto, state: 'started' }).save()
+    return new this.jobModel({
+      ...dto,
+      state: 'started',
+      payment: { status: 'unpaid' },
+    }).save()
+  }
+
+  update(id: string, dto: UpdateJobDto): Promise<Job> {
+    // TODO: handle if not found
+    // TODO: implement some form of locking (optimistic locking etc). Can ignore for now as we have 1 user.
+    return this.jobModel
+      .findByIdAndUpdate(
+        id,
+        { ...dto, state: dto.payment.status === 'paid' ? 'paid' : undefined },
+        { new: true },
+      )
+      .exec()
   }
 
   getAll(): Promise<Job[]> {

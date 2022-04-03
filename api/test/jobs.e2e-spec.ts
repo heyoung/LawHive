@@ -56,7 +56,11 @@ describe('JobsController (e2e)', () => {
       .expect(201)
 
     // Assert
-    expect(resp.body).toMatchObject({ ...body, state: 'started' })
+    expect(resp.body).toMatchObject({
+      ...body,
+      state: 'started',
+      payment: { status: 'unpaid' },
+    })
     expect(mongoose.isValidObjectId(resp.body._id)).toBe(true)
   })
 
@@ -82,9 +86,99 @@ describe('JobsController (e2e)', () => {
         .send(body)
 
       expect(resp.ok).toBe(false)
+      expect(resp.statusCode).toBe(400)
       expect(resp.body).toHaveProperty('error')
       expect(resp.body).toHaveProperty('message')
       expect(resp.body).toHaveProperty('statusCode')
+    },
+  )
+
+  test('/v1/jobs/{:id} (PUT) updates job and returns updated job when job exists', async () => {
+    // Assemble
+    const body: CreateJobDto = {
+      title: 'put test job',
+      description: 'description',
+      fee: { type: 'fixed-fee', fee: 100 },
+    }
+
+    const createdJob = (
+      await request(app.getHttpServer()).post('/v1/jobs').send(body)
+    ).body
+
+    const update = {
+      ...createdJob,
+      title: 'new test title',
+    }
+
+    // Act
+    const resp = await request(app.getHttpServer())
+      .put(`/v1/jobs/${createdJob._id}`)
+      .send(update)
+
+    // Assert
+    expect(resp.ok).toBe(true)
+    expect(resp.body).toMatchObject(update)
+  })
+
+  test('/v1/jobs/{:id} (PUT) when job is paid sets job state to paid', async () => {
+    // Assemble
+    const body: CreateJobDto = {
+      title: 'put test job',
+      description: 'description',
+      fee: { type: 'fixed-fee', fee: 100 },
+    }
+
+    const createdJob = (
+      await request(app.getHttpServer()).post('/v1/jobs').send(body)
+    ).body
+
+    const update = {
+      ...createdJob,
+      payment: { status: 'paid', amount: 180 },
+    }
+
+    // Act
+    const resp = await request(app.getHttpServer())
+      .put(`/v1/jobs/${createdJob._id}`)
+      .send(update)
+
+    // Assert
+    expect(resp.ok).toBe(true)
+    expect(resp.body).toMatchObject({ ...update, state: 'paid' })
+  })
+
+  test.each([
+    { status: 'na' },
+    { status: 'paid' },
+    { status: 'paid', amount: 'hello' },
+    { status: 'paid', amount: -10 },
+  ])(
+    '/v1/jobs/{:id} (PUT) when payment property is invalid (%j) returns error response',
+    async (payment) => {
+      // Assemble
+      const body: CreateJobDto = {
+        title: 'put test job',
+        description: 'description',
+        fee: { type: 'fixed-fee', fee: 100 },
+      }
+
+      const createdJob = (
+        await request(app.getHttpServer()).post('/v1/jobs').send(body)
+      ).body
+
+      const update = {
+        ...createdJob,
+        payment,
+      }
+
+      // Act
+      const resp = await request(app.getHttpServer())
+        .put(`/v1/jobs/${createdJob._id}`)
+        .send(update)
+
+      // Assert
+      expect(resp.ok).toBe(false)
+      expect(resp.statusCode).toBe(400)
     },
   )
 

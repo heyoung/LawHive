@@ -1,4 +1,4 @@
-import { IsIn, IsNotEmpty } from 'class-validator'
+import { IsIn, IsNotEmpty, IsNumber } from 'class-validator'
 
 // TODO: split this file out
 
@@ -26,6 +26,7 @@ export class NoWinNoFeeDto extends BaseFeeDto {
   type: NoWinNoFeeDiscriminator
 
   @IsNotEmpty()
+  @IsNumber()
   feePct: number
 }
 
@@ -33,6 +34,7 @@ export class FixedFeeDto extends BaseFeeDto {
   type: FixedFeeDiscriminator
 
   @IsNotEmpty()
+  @IsNumber()
   fee: number
 }
 
