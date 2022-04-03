@@ -72,6 +72,12 @@ const JobDetail: React.FC<{ job: Job }> = ({ job }) => {
           <Typography variant="body2" color="text.secondary">
             {job.description}
           </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {job.fee.type}:
+            {job.fee.type === 'fixed-fee'
+              ? `£${job.fee.fee}`
+              : `${job.fee.feePct}%`}
+          </Typography>
         </CardContent>
       </div>
     </Card>

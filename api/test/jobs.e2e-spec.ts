@@ -4,7 +4,7 @@ import * as request from 'supertest'
 import { AppModule } from '../src/app.module'
 import { setup } from '../src/setup'
 import mongoose from 'mongoose'
-import { Job } from '../src/models/job'
+import { CreateJobDto, Job } from '../src/models/job'
 
 describe('JobsController (e2e)', () => {
   let app: INestApplication
@@ -28,7 +28,11 @@ describe('JobsController (e2e)', () => {
     const createdJob: Job = (
       await request(server)
         .post('/v1/jobs')
-        .send({ title: 'get test', description: 'description' })
+        .send({
+          title: 'title',
+          description: 'description',
+          fee: { type: 'fixed-fee', fee: 10 },
+        })
     ).body
 
     // Act
@@ -41,7 +45,11 @@ describe('JobsController (e2e)', () => {
   })
 
   it('/v1/jobs (POST) returns created job', async () => {
-    const body = { title: 'title', description: 'description' }
+    const body: CreateJobDto = {
+      title: 'title',
+      description: 'description',
+      fee: { type: 'fixed-fee', fee: 10 },
+    }
     const resp = await request(app.getHttpServer())
       .post('/v1/jobs')
       .send(body)
@@ -52,15 +60,33 @@ describe('JobsController (e2e)', () => {
     expect(mongoose.isValidObjectId(resp.body._id)).toBe(true)
   })
 
-  it('/v1/jobs (POST) returns error response when body is invalid', async () => {
-    const body = { foo: 'bar' }
-    const resp = await request(app.getHttpServer()).post('/v1/jobs').send(body)
+  test.each([
+    { foo: 'bar' },
+    { title: 'name', description: 'desc' },
+    { title: 'title', description: 'description', fee: { type: 'fixed-fee' } },
+    {
+      title: 'title',
+      description: 'description',
+      fee: { type: 'no-win-no-fee' },
+    },
+    {
+      title: 'title',
+      description: 'description',
+      fee: { type: 'random-type' },
+    },
+  ])(
+    '/v1/jobs (POST) %j returns error response when body is invalid',
+    async (body) => {
+      const resp = await request(app.getHttpServer())
+        .post('/v1/jobs')
+        .send(body)
 
-    expect(resp.ok).toBe(false)
-    expect(resp.body).toHaveProperty('error')
-    expect(resp.body).toHaveProperty('message')
-    expect(resp.body).toHaveProperty('statusCode')
-  })
+      expect(resp.ok).toBe(false)
+      expect(resp.body).toHaveProperty('error')
+      expect(resp.body).toHaveProperty('message')
+      expect(resp.body).toHaveProperty('statusCode')
+    },
+  )
 
   afterAll(async () => {
     await app.close()

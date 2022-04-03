@@ -1,4 +1,13 @@
-import { Alert, Box, Grid, Paper, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Grid,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { useFormik } from 'formik'
 import { useState } from 'react'
@@ -7,10 +16,23 @@ import { createJob } from '../api/job-api'
 import { pipe } from 'fp-ts/lib/function'
 import { match } from 'fp-ts/lib/Either'
 import { useNavigate } from 'react-router-dom'
+import { Fee } from '../models/fee'
 
 const validationSchema = yup.object({
   title: yup.string().required('title is required'),
   description: yup.string().required('description is required'),
+  feeType: yup
+    .string()
+    .test((x) => x === 'no-win-no-fee' || x === 'fixed-fee')
+    .required('fee type is required'),
+  feePct: yup.number().when('feeType', {
+    is: 'no-win-no-fee',
+    then: yup.number().max(100).min(0).required('fee percentage is required'),
+  }),
+  fee: yup.number().when('feeType', {
+    is: 'fixed-fee',
+    then: yup.number().min(0).required('fee is required'),
+  }),
 })
 
 const JobForm: React.FC = () => {
@@ -18,10 +40,41 @@ const JobForm: React.FC = () => {
   const navigate = useNavigate()
 
   const formik = useFormik({
-    initialValues: { title: '', description: '' },
+    initialValues: {
+      title: '',
+      description: '',
+      feeType: 'no-win-no-fee',
+      feePct: undefined,
+      fee: undefined,
+    },
     validationSchema,
     onSubmit: async (values) => {
-      const response = await createJob(values)
+      let fee: Fee | null = null
+
+      // feePct and fee should not be undefined here based on the validator above.
+      // but we throw the error to ensure TS shows the correct types here
+      if (values.feeType === 'no-win-no-fee') {
+        if (values.feePct === undefined) {
+          throw new Error('feePct is undefined')
+        }
+
+        fee = {
+          type: 'no-win-no-fee',
+          feePct: values.feePct,
+        }
+      } else {
+        if (values.fee === undefined) {
+          throw new Error('fee is undefined')
+        }
+
+        fee = { type: 'fixed-fee', fee: values.fee }
+      }
+
+      const response = await createJob({
+        title: values.title,
+        description: values.description,
+        fee,
+      })
 
       pipe(
         response,
@@ -93,6 +146,53 @@ const JobForm: React.FC = () => {
                 }
               />
             </Grid>
+            <Grid item xs={12}>
+              <Select
+                labelId="fee-type-select"
+                id="fee-type-select"
+                name="feeType"
+                label="Fee Type"
+                value={formik.values.feeType}
+                onChange={formik.handleChange}
+                disabled={formik.isSubmitting}
+                error={formik.touched.feeType && !!formik.errors.feeType}
+              >
+                <MenuItem value={'no-win-no-fee'}>No Win No Fee</MenuItem>
+                <MenuItem value={'fixed-fee'}>Fixed</MenuItem>
+              </Select>
+            </Grid>
+            {formik.values.feeType === 'no-win-no-fee' && (
+              <Grid item xs={12}>
+                <TextField
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                  id="feePct"
+                  name="feePct"
+                  label="Fee %"
+                  fullWidth
+                  value={formik.values.feePct}
+                  onChange={formik.handleChange}
+                  disabled={formik.isSubmitting}
+                  error={formik.touched.feePct && !!formik.errors.feePct}
+                  helperText={formik.touched.feePct && formik.errors.feePct}
+                />
+              </Grid>
+            )}
+            {formik.values.feeType === 'fixed-fee' && (
+              <Grid item xs={12}>
+                <TextField
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                  id="fee"
+                  name="fee"
+                  label="Fixed Fee (£)"
+                  fullWidth
+                  value={formik.values.fee}
+                  onChange={formik.handleChange}
+                  disabled={formik.isSubmitting}
+                  error={formik.touched.fee && !!formik.errors.fee}
+                  helperText={formik.touched.fee && formik.errors.fee}
+                />
+              </Grid>
+            )}
           </Grid>
           <LoadingButton
             color="primary"
