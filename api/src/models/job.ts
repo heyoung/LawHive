@@ -3,6 +3,12 @@ import { Type } from 'class-transformer'
 import { IsDefined, IsNotEmpty, ValidateNested } from 'class-validator'
 import { Document } from 'mongoose'
 import { BaseFeeDto, Fee, FeeDto, FixedFeeDto, NoWinNoFeeDto } from './fee'
+import {
+  BasePaymentDto,
+  PaidPaymentDto,
+  Payment,
+  UnpaidPaymentDto,
+} from './payment'
 
 // TODO: split this file out?
 export type JobDocument = Job & Document
@@ -22,6 +28,9 @@ export class Job {
 
   @Prop({ type: Object })
   fee: Fee
+
+  @Prop({ type: Object })
+  payment: Payment
 }
 
 export class CreateJobDto {
@@ -44,6 +53,22 @@ export class CreateJobDto {
     },
   })
   fee: FeeDto
+}
+
+export class UpdateJobDto extends CreateJobDto {
+  @ValidateNested()
+  @IsDefined()
+  @Type(() => BasePaymentDto, {
+    keepDiscriminatorProperty: true,
+    discriminator: {
+      property: 'status',
+      subTypes: [
+        { value: PaidPaymentDto, name: 'paid' },
+        { value: UnpaidPaymentDto, name: 'unpaid' },
+      ],
+    },
+  })
+  payment: PaidPaymentDto | UnpaidPaymentDto
 }
 
 export const JobSchema = SchemaFactory.createForClass(Job)
