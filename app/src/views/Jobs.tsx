@@ -66,6 +66,7 @@ const JobDetail: React.FC<{ job: Job }> = ({ job }) => {
       <div>
         <CardContent>
           <Chip label={job.state} color="primary" />
+          <Chip label={job.payment.status} color="primary" />
           <Typography gutterBottom variant="h5" component="div">
             {job.title}
           </Typography>
