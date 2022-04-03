@@ -13,3 +13,7 @@ export function createJob(
 ): Promise<E.Either<Job, ErrorResponse>> {
   return sendRequest<Job>(() => axios.post('/v1/jobs', dto))
 }
+
+export function updateJob(dto: Job): Promise<E.Either<Job, ErrorResponse>> {
+  return sendRequest<Job>(() => axios.put(`/v1/jobs/${dto._id}`, dto))
+}
