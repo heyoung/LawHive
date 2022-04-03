@@ -21,7 +21,13 @@ export class JobsService {
   update(id: string, dto: UpdateJobDto): Promise<Job> {
     // TODO: handle if not found
     // TODO: implement some form of locking (optimistic locking etc). Can ignore for now as we have 1 user.
-    return this.jobModel.findByIdAndUpdate(id, dto, { new: true }).exec()
+    return this.jobModel
+      .findByIdAndUpdate(
+        id,
+        { ...dto, state: dto.payment.status === 'paid' ? 'paid' : undefined },
+        { new: true },
+      )
+      .exec()
   }
 
   getAll(): Promise<Job[]> {

@@ -13,7 +13,7 @@ import {
 // TODO: split this file out?
 export type JobDocument = Job & Document
 
-type JobState = 'started'
+type JobState = 'started' | 'paid'
 
 @Schema()
 export class Job {

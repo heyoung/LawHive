@@ -107,7 +107,7 @@ describe('JobsController (e2e)', () => {
 
     const update = {
       ...createdJob,
-      payment: { status: 'paid', amount: 180 },
+      title: 'new test title',
     }
 
     // Act
@@ -118,6 +118,33 @@ describe('JobsController (e2e)', () => {
     // Assert
     expect(resp.ok).toBe(true)
     expect(resp.body).toMatchObject(update)
+  })
+
+  test('/v1/jobs/{:id} (PUT) when job is paid sets job state to paid', async () => {
+    // Assemble
+    const body: CreateJobDto = {
+      title: 'put test job',
+      description: 'description',
+      fee: { type: 'fixed-fee', fee: 100 },
+    }
+
+    const createdJob = (
+      await request(app.getHttpServer()).post('/v1/jobs').send(body)
+    ).body
+
+    const update = {
+      ...createdJob,
+      payment: { status: 'paid', amount: 180 },
+    }
+
+    // Act
+    const resp = await request(app.getHttpServer())
+      .put(`/v1/jobs/${createdJob._id}`)
+      .send(update)
+
+    // Assert
+    expect(resp.ok).toBe(true)
+    expect(resp.body).toMatchObject({ ...update, state: 'paid' })
   })
 
   test.each([
