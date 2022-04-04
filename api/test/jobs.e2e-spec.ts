@@ -44,23 +44,51 @@ describe('JobsController (e2e)', () => {
     expect(resp.body).toEqual([createdJob])
   })
 
-  it('/v1/jobs (POST) returns created job', async () => {
-    const body: CreateJobDto = {
-      title: 'title',
-      description: 'description',
-      fee: { type: 'fixed-fee', fee: 10 },
-    }
+  test.each([
+    [
+      {
+        title: 'title',
+        description: 'description',
+        fee: { type: 'fixed-fee', fee: 10 },
+      },
+      {
+        title: 'title',
+        description: 'description',
+        fee: { type: 'fixed-fee', fee: 10 },
+        state: 'started',
+        payment: { status: 'unpaid' },
+      },
+    ],
+    [
+      {
+        title: 'title',
+        description: 'description',
+        fee: {
+          type: 'no-win-no-fee',
+          feePct: 10,
+          expectedSettlementAmount: 100,
+        },
+      },
+      {
+        title: 'title',
+        description: 'description',
+        fee: {
+          type: 'no-win-no-fee',
+          feePct: 10,
+          expectedSettlementAmount: 100,
+        },
+        state: 'started',
+        payment: { status: 'unpaid' },
+      },
+    ],
+  ])('/v1/jobs (POST) posting %j creates new job', async (body, expected) => {
     const resp = await request(app.getHttpServer())
       .post('/v1/jobs')
       .send(body)
       .expect(201)
 
     // Assert
-    expect(resp.body).toMatchObject({
-      ...body,
-      state: 'started',
-      payment: { status: 'unpaid' },
-    })
+    expect(resp.body).toMatchObject(expected)
     expect(mongoose.isValidObjectId(resp.body._id)).toBe(true)
   })
 
@@ -77,6 +105,29 @@ describe('JobsController (e2e)', () => {
       title: 'title',
       description: 'description',
       fee: { type: 'random-type' },
+    },
+    {
+      title: 'title',
+      description: 'description',
+      fee: { type: 'no-win-no-fee', feePct: 10 },
+    },
+    {
+      title: 'title',
+      description: 'description',
+      fee: {
+        type: 'no-win-no-fee',
+        feePct: 10,
+        expectedSettlementAmount: 'nothing',
+      },
+    },
+    {
+      title: 'title',
+      description: 'description',
+      fee: {
+        type: 'no-win-no-fee',
+        feePct: 10,
+        expectedSettlementAmount: -100,
+      },
     },
   ])(
     '/v1/jobs (POST) %j returns error response when body is invalid',

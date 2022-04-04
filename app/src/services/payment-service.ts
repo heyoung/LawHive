@@ -1,5 +1,7 @@
 import { FixedFee, NoWinNoFee } from '../models/fee'
 
+const VALID_SETTLEMENT_THRESHOLD_PCT = 0.1
+
 export function calculatePayment(
   fee: FixedFee | NoWinNoFee,
   settlement?: number,
@@ -20,4 +22,26 @@ export function calculatePayment(
     default:
       throw new Error('Unknow fee type')
   }
+}
+
+type ValidationResult = { valid: true } | { valid: false; reason: string }
+
+export function isSettlementValid(
+  fee: NoWinNoFee,
+  settlement: number,
+): ValidationResult {
+  const lowerBound =
+    fee.expectedSettlementAmount -
+    VALID_SETTLEMENT_THRESHOLD_PCT * fee.expectedSettlementAmount
+
+  const upperBound =
+    fee.expectedSettlementAmount +
+    VALID_SETTLEMENT_THRESHOLD_PCT * fee.expectedSettlementAmount
+
+  return settlement >= lowerBound && settlement <= upperBound
+    ? { valid: true }
+    : {
+        valid: false,
+        reason: 'settlement is not within valid range of expected settlement',
+      }
 }
