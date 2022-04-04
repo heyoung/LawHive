@@ -33,19 +33,34 @@ const validationSchema = yup.object({
     is: 'fixed-fee',
     then: yup.number().min(0).required('fee is required'),
   }),
+  expectedSettlementAmount: yup.number().when('feeType', {
+    is: 'no-win-no-fee',
+    then: yup
+      .number()
+      .min(0)
+      .required('expected settlement amount is required for no-win-no-fee'),
+  }),
 })
 
 const JobForm: React.FC = () => {
   const [error, setError] = useState<string | undefined>()
   const navigate = useNavigate()
 
-  const formik = useFormik({
+  const formik = useFormik<{
+    title: string
+    description: string
+    feeType: string
+    feePct?: number
+    fee?: number
+    expectedSettlementAmount?: number
+  }>({
     initialValues: {
       title: '',
       description: '',
       feeType: 'no-win-no-fee',
       feePct: undefined,
       fee: undefined,
+      expectedSettlementAmount: undefined,
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -61,6 +76,7 @@ const JobForm: React.FC = () => {
         fee = {
           type: 'no-win-no-fee',
           feePct: Number(values.feePct),
+          expectedSettlementAmount: Number(values.expectedSettlementAmount),
         }
       } else {
         if (values.fee === undefined) {
@@ -162,20 +178,45 @@ const JobForm: React.FC = () => {
               </Select>
             </Grid>
             {formik.values.feeType === 'no-win-no-fee' && (
-              <Grid item xs={12}>
-                <TextField
-                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                  id="feePct"
-                  name="feePct"
-                  label="Fee %"
-                  fullWidth
-                  value={formik.values.feePct}
-                  onChange={formik.handleChange}
-                  disabled={formik.isSubmitting}
-                  error={formik.touched.feePct && !!formik.errors.feePct}
-                  helperText={formik.touched.feePct && formik.errors.feePct}
-                />
-              </Grid>
+              <>
+                <Grid item xs={12}>
+                  <TextField
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                    id="feePct"
+                    name="feePct"
+                    label="Fee %"
+                    fullWidth
+                    value={formik.values.feePct}
+                    onChange={formik.handleChange}
+                    disabled={formik.isSubmitting}
+                    error={formik.touched.feePct && !!formik.errors.feePct}
+                    helperText={formik.touched.feePct && formik.errors.feePct}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                    id="expectedSettlementAmount"
+                    name="expectedSettlementAmount"
+                    label="Expected Settlement Amount"
+                    fullWidth
+                    value={formik.values.expectedSettlementAmount}
+                    onChange={(e) => {
+                      console.log(e)
+                      formik.handleChange(e)
+                    }}
+                    disabled={formik.isSubmitting}
+                    error={
+                      formik.touched.expectedSettlementAmount &&
+                      !!formik.errors.expectedSettlementAmount
+                    }
+                    helperText={
+                      formik.touched.expectedSettlementAmount &&
+                      formik.errors.expectedSettlementAmount
+                    }
+                  />
+                </Grid>
+              </>
             )}
             {formik.values.feeType === 'fixed-fee' && (
               <Grid item xs={12}>
