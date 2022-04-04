@@ -1,4 +1,4 @@
-import { IsIn, IsNotEmpty, IsNumber } from 'class-validator'
+import { IsIn, IsNotEmpty, IsNumber, IsPositive } from 'class-validator'
 
 // TODO: split this file out
 
@@ -8,6 +8,7 @@ type FixedFeeDiscriminator = 'fixed-fee'
 interface NoWinNoFee {
   type: NoWinNoFeeDiscriminator
   feePct: number
+  expectedSettlementAmount: number
 }
 
 interface FixedFee {
@@ -28,6 +29,10 @@ export class NoWinNoFeeDto extends BaseFeeDto {
   @IsNotEmpty()
   @IsNumber()
   feePct: number
+
+  @IsNotEmpty()
+  @IsPositive()
+  expectedSettlementAmount: number
 }
 
 export class FixedFeeDto extends BaseFeeDto {
