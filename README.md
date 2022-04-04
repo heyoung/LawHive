@@ -2,11 +2,11 @@
 
 ## Introduction
 
-You’ve been asked to build a new application and service that allows a solicitor to create legal job postings, and allows a client to pay for a job that has been undertaken. 
+You’ve been asked to build a new application and service that allows a solicitor to create legal job postings, and allows a client to pay for a job that has been undertaken.
 
 The challenge has been designed to get progressively more difficult in order to gauge decision making and how a candidate deals with changing requirements and complexity.
 
-You may take as much time as you wish to complete the challenge if you wish to complete all tasks, but we recommend time-boxing your work to 3-4 hours. 
+You may take as much time as you wish to complete the challenge if you wish to complete all tasks, but we recommend time-boxing your work to 3-4 hours.
 
 This is to avoid taking too much of your time, and the amount of time spent on the challenge will be applied contextually. In a shorter timeframe, we do not expect all candidates to complete all tasks.
 
@@ -16,7 +16,7 @@ Also make notes on the trade-offs or weaknesess of your implementation.
 
 Commit the notes you've made in the README.md
 
-After the challenge, we will schedule a follow-up call to talk through your experience, challenges faced, decisions made and your notes. 
+After the challenge, we will schedule a follow-up call to talk through your experience, challenges faced, decisions made and your notes.
 
 ## How we assess the challenge
 
@@ -24,7 +24,7 @@ We're looking for how you think about building products and systems. What this m
 
 In practice, this includes:
 
-- Architecture/tool/library decisions 
+- Architecture/tool/library decisions
 - Code structure and cleanliness
 - Domain modelling decisions and abstraction choices
 - Use of best-practices and principles
@@ -34,9 +34,9 @@ In practice, this includes:
 - Showcasing your code opinions and creativity
 
 It does **not** include:
+
 - Visual design skills or how "pretty" it is
 - 100% test coverage
-
 
 ## How to submit your answers
 
@@ -58,7 +58,6 @@ Should you need help or any clarification, feel free to email us.
 
 - The completed project should have a frontend UI, a backend API and a data persistance layer.
 
-
 We've provided initial "hello world" implementations of a UI and API for you to work with. Please use this to start with, and feel free to make any changes you see fit for your solutions.
 
 ```bash
@@ -68,7 +67,7 @@ We've provided initial "hello world" implementations of a UI and API for you to 
 # CRA SPA
 /app
 
-# Basic database setup 
+# Basic database setup
 docker-compose.yml
 ```
 
@@ -77,27 +76,29 @@ docker-compose.yml
 `/app`: Web UI using React, built in [Create-React-App](https://create-react-app.dev/docs/adding-typescript/) and optional [MaterialUI](https://mui.com/getting-started/installation/).
 
 Details:
+
 - There's no requirement for SSR / static generation
 - Design is a nice-to-have but not required, vanilla CSS/a component library/etc. are all fine.
 
-### Backend 
+### Backend
 
 `/api`: A NodeJS API with [NestJS](https://docs.nestjs.com/)
 
 Details:
+
 - JSON should be the content type of all interactions
 
-### Database 
+### Database
 
 Scaffolded in `docker-compose.yml`: A MongoDB database
 
 Embedded in `api`: [Mongoose](https://mongoosejs.com/docs/typescript.html)
 
 Details:
+
 - If desired, you can switch to a DB you are more familiar with, and if necessary any ORM
 
-
-### Testing 
+### Testing
 
 This challenge only contains two places where tests are required (story 3/4).
 
@@ -107,11 +108,12 @@ Implemented in `api`: `yarn test:unit` or `yarn test:e2e`
 Using [Jest](https://jestjs.io/docs/getting-started#using-typescript-via-ts-jest) + [ts-jest](https://kulshekhar.github.io/ts-jest/docs/getting-started/installation)
 
 Details:
+
 - Tests can be at any level you see fit (unit, integration, e2e)
 
 # The Story
 
-You’ve been asked to build a new application and service that allows a solicitor to create legal job postings, and allows a client to pay for a job that has been undertaken. 
+You’ve been asked to build a new application and service that allows a solicitor to create legal job postings, and allows a client to pay for a job that has been undertaken.
 
 This requires delivering a UI and API which satisfies the user stories outlined below.
 
@@ -132,9 +134,9 @@ As a client, I need to be able to see a list of legal job postings.
 ### Details
 
 A legal job posting contains:
+
 - A `title` (string)
 - A `description` (long string)
-
 
 When a solicitor creates a legal job, it is in a `started` state.
 
@@ -146,7 +148,7 @@ Solicitors can use a form on the app to create a new job posting, clients use th
 
 We receive new requirements that each job posting needs a new field to store a `fee structure` in the system.
 
-There are two types of `fee structure`: `No-Win-No-Fee`, or `Fixed-Fee`. 
+There are two types of `fee structure`: `No-Win-No-Fee`, or `Fixed-Fee`.
 
 - `No-Win-No-Fee` jobs require the parameter: `Fee Percentage`
 - `Fixed-Fee` jobs require the parameter `Fee Amount`
@@ -165,7 +167,7 @@ Consider how the UI and data model needs to change to accomodate selecting the d
 
 ## Story 3:
 
-We receive new requirements that a client using the application needs to show that they have paid for a legal job posting. 
+We receive new requirements that a client using the application needs to show that they have paid for a legal job posting.
 
 Note: "Paying for" legal work doesn’t need to actually trigger any financial transfer / APIs - it just stores in the system that a job has been paid, and the amount that was paid.
 
@@ -179,13 +181,13 @@ As a client or solicitor, I need to be able to see how much was paid to the soli
 
 ### Details
 
-How a payment works depends on the type of job posting: 
+How a payment works depends on the type of job posting:
 
 #### For Fixed-Fee jobs:
 
 No inputs are required to complete the payment.
 
-The `amount paid` upon payment is the `fee amount`. 
+The `amount paid` upon payment is the `fee amount`.
 
 #### For No-Win-No-Fee jobs:
 
@@ -201,7 +203,7 @@ There should be tests covering how the `amount paid` is calculated.
 
 Once a payment is completed, the job enters a state of `paid`.
 
-Paying for a case should happen by entering details / pressing a button on  the relevant job list item. You don't need to use additional screens.
+Paying for a case should happen by entering details / pressing a button on the relevant job list item. You don't need to use additional screens.
 
 The status of `paid` and the `amount paid` should be displayed in the UI.
 
@@ -223,7 +225,7 @@ As a client, I need to be shown an error if I enter a settlement amount which di
 
 Change the payment command to include logic for: If the `Settlement Amount` entered is not within 10% of the `Expected Settlement Amount`, the payment should fail and show an error to the user.
 
-There should be tests validating the calculation that if the `settlement amount` is outside of 10% of the `expected settlement amount`, the operation would fail. 
+There should be tests validating the calculation that if the `settlement amount` is outside of 10% of the `expected settlement amount`, the operation would fail.
 Alternatively, it should test for valid `settlement amounts` within 10%.
 
 The error should display in the UI alongside the payment form/button.
@@ -243,9 +245,9 @@ As a client, I would like to see a relevant summary of the news article in a job
 ### Details
 
 Some examples sources of legal job postings are the following articles:
+
 - [https://www.bbc.co.uk/news/world-59793040](https://www.bbc.co.uk/news/world-59793040)
 - [https://www.bbc.co.uk/news/business-60667173](https://www.bbc.co.uk/news/business-60667173)
-
 
 These news articles contain a description of a legal issue that is relevant to a job posting a solicitor wants to make.
 
@@ -257,14 +259,65 @@ Display the contents of the news article alongside the job posting in the list.
 
 ---
 
-# Your TODO 
+# Your TODO
 
 - [x] Initial codebase setup (hello world)
-- [ ] Story 1 
-- [ ] Story 2
-- [ ] Story 3
-- [ ] Story 4
+- [x] Story 1
+- [x] Story 2
+- [x] Story 3
+- [x] Story 4
 - [ ] Story 5
 
-- [ ] Written notes on incomplete stories
+- [x] Written notes on incomplete stories
 - [ ] Written notes on weaknesses, tradeoffs and improvements
+
+# Notes on Story 5
+
+- What if the article content changes (updates/redactions etc). Do we want to have a mechanism to periodically synchronise them?
+  - If there are multiple links to the same article can we scrape once
+  - This would require storing the url alongside to fetch the update
+    - Two urls can resolve to the same page but have different urls (url shortener etc.)
+- How do we determine the relevant content of an article?
+  - Do we need to parse the html body ourselves and strip out the extraneous info
+  - Are there api's we can use? RSS? Third part tools/libraries?
+- We need to validate on job creation that the article exists
+  - Url is valid + we are able to fetch the relevant content
+- We want to store the article content; quickest way is to store this as a property on the job model
+  - The article contents could potentially be massive if we not do any summarisation etc.
+  - Should add protetctions around the article size we store?
+- Are there any issues around fetching the content?
+  - E.g website protection from scraping; would we get CORS issues if we tried fetching it direct from the browser?
+
+# Weaknesses, tradeoffs and improvements
+
+In no particular order:
+
+- The UI design is hot garbage. Lots of room for improvement.
+- No protection against concurrent modifications
+  - For the purpose of this exercise assuming a single lawyer and single client mitigates the need for this but would be need to real world implementation
+  - There looks like there is some built in support for optimistic loking on the documents that could be easier to use
+- All the business logic and a lot of the validation is done on the UI
+  - This is for i. speed of development and ii. the only client we need to support is the ui
+  - It is good to have the validation on the UI as it provides a better UX in my opinion. Faster feedback loop for the user.
+  - It is also good to have the validation on the backend for i. security in depth (validate your external inputs) and ii. makes it easier to support new clients (e.g api clients)
+- There are no indexes on the db; could be added for better searching etc. Not really needed for this exercise.
+- Would be good to add metadata to some documents (payment, job) such as created/updated datetime. This can be good for a user to see and helpful for us in debugging etc.
+- I am not sure the structure of the backend code is idiomatic of nest.js
+- Adding more logging would be good. Although the server does not do much atm.
+- Think the configuration could be handled better
+  - Have it loaded/have dev vs prod config etc
+  - Currently just hardcoded which isn't great
+- We don't handle failures in the mongo service
+  - I think returning some Result type would be good so we can encapsulate success or errors better instead of throwing which the current behaviour
+  - Furthermore, it does not protect against potentially common events such as querying for a job that does not exist. I think currently it would just throw
+    - In this situation it should return null as a valid response
+- e2e tests are against an in memory mongo db. Would be nice to test a persisted mongo db.
+- The UI could parse the error responses to get the error response json with the exact error messages provided. Better UX.
+- I am not a fan of the definitions of both the model + schema + dtos. Seems like a lot of duplication to me.
+- There is no concept of solicitor or client
+- Payment is currently on the job iteself. I can imagine the payments themselves being its own document
+  - Could have multiple payments to a job
+  - A payment can have multiple different states itself (pending, failed etc)
+- Current api for making a payment requires putting the entire job json to the server with the payment updates
+  - I think a better api would be to post a payment to /jobs/{id}/payments etc
+  - Alternatively support PATCH on a job
