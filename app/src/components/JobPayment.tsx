@@ -2,12 +2,16 @@ import { Alert, Box, Button, Grid, Paper, TextField } from '@mui/material'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
 import { updateJob } from '../api/job-api'
-import Job from '../models/job'
-import { calculatePayment } from '../services/payment-service'
+import Job, { isFixedFeeJob, isNoWinNoFeeJob } from '../models/job'
+import {
+  calculatePayment,
+  isSettlementValid,
+} from '../services/payment-service'
 import { LoadingButton } from '@mui/lab'
 import { useState } from 'react'
 import { pipe } from 'fp-ts/lib/function'
 import { match } from 'fp-ts/lib/Either'
+import { NoWinNoFee } from '../models/fee'
 
 // TODO: remove duplication between the two submit handlers
 const JobPayment: React.FC<{ job: Job; onPaymentSubmitted: () => void }> = ({
@@ -20,7 +24,7 @@ const JobPayment: React.FC<{ job: Job; onPaymentSubmitted: () => void }> = ({
 
   let child: JSX.Element | null = null
 
-  if (job.fee.type === 'fixed-fee') {
+  if (isFixedFeeJob(job)) {
     child = (
       <Button
         onClick={async () => {
@@ -47,7 +51,7 @@ const JobPayment: React.FC<{ job: Job; onPaymentSubmitted: () => void }> = ({
     )
   }
 
-  if (job.fee.type === 'no-win-no-fee') {
+  if (isNoWinNoFeeJob(job)) {
     child = (
       <NoWinNoFeePayment
         job={job}
@@ -70,7 +74,7 @@ const JobPayment: React.FC<{ job: Job; onPaymentSubmitted: () => void }> = ({
 }
 
 const NoWinNoFeePayment: React.FC<{
-  job: Job
+  job: Job & { fee: NoWinNoFee }
   onPaymentSubmitted: () => void
   onError: (value: string) => void
 }> = ({ job, onPaymentSubmitted, onError }) => {
@@ -79,7 +83,17 @@ const NoWinNoFeePayment: React.FC<{
       settlement: undefined,
     },
     validationSchema: yup.object({
-      settlement: yup.number().min(0).required('settlement is required'),
+      settlement: yup
+        .number()
+        .min(0)
+        .test(
+          'is-within-expected-range',
+          'settlement is not within expected range',
+          // TODO: can we use the error message from the validation?
+          (value) =>
+            value !== undefined && isSettlementValid(job.fee, value).valid,
+        )
+        .required('settlement is required'),
     }),
     onSubmit: async (values) => {
       const settlement = Number(values.settlement)
